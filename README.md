@@ -71,7 +71,7 @@ If you are using `git` you will need to add, commit, and push your changes. Cons
 > Please note this is an oversimplified example and might not be the right cron job for you.
 
 ## TODOs
-- [] linux copy support
-- [] git detection and syncing
-- [] bash completion
-- [] zsh completion
+- [ ] linux copy support
+- [ ] git detection and syncing
+- [ ] bash completion
+- [ ] zsh completion
