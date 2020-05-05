@@ -1,51 +1,22 @@
 #!/usr/bin/env sh
 # TODO
-# - write main functions
-# - allow for visual editors
-# - allow bat command for syntax hightlighting
-# - configure bat env variables [see dotfiles]
 # - look for necessary commands at startup
 # - linux copy support
 
 # getopts config
 set -e
-set -u
+# set -u
 
 # Global Varibles
+SCRIPTNAME=$(basename $0)
 UNAME=$(uname)
 CATCMD=$(which cat)
+[ -z $SNIPPYEDITOR ] && SNIPPYEDITOR=$EDITOR
 [ -z $SNIPPYFILES ] && SNIPPYFILES="$HOME/.snippy"
 SNIPPYVERSION='v1.0'
 
-isInstalled bat && {
-    # BAT COMMAND OPTIONS
-    export BAT_PAGER=''
-    export BAT_STYLE='plain'
-    CATCMD=$(which bat)
-}
-
-
-# CONFIG
-[ ! -d "$SNIPPYFILES" ] && mkdir -p $SNIPPYFILES
-
 # Helper Functions
-function helper () {
-    echo "$SCRIPTNAME $SNIPPYVERSION"
-    echo "USAGE:"
-    echo -e "\t$SCRIPTNAME [-lendpcvh] [snippet]"
-    echo "OPTIONS:"
-    echo -e "\t-l\tList all exiting snippets"
-    echo -e "\t-e\tEdit snippet"
-    echo -e "\t-n\tCreates new snippet"
-    echo -e "\t-d\tDelete snippet"
-    echo -e "\t-p\tPreview snippet"
-    isMac && echo -e "\t-c\tCopy snippet content"
-    echo -e "\t-v\tPrints $SCRIPTNAME version"
-    echo -e "\t-h\tPrints this help menu"
-}
-
-
-function isInstalled () {
+isInstalled () {
     if type "$1" > /dev/null; then
         return 0
     fi
@@ -53,66 +24,101 @@ function isInstalled () {
     return 1
 }
 
-function isMac () {
-    [ "$UNAME" == "Darwin" ]
+isMac () {
+    [ "$UNAME" = "Darwin" ]
 }
 
-function isLinux () {
-    [ "$UNAME" == "Linux" ]
+isLinux () {
+    [ "$UNAME" = "Linux" ]
+}
+
+
+# Config
+[ ! -d "$SNIPPYFILES" ] && mkdir -p $SNIPPYFILES
+[ ! -d "$SNIPPYFILES/.trash" ] && mkdir -p "$SNIPPYFILES/.trash"
+
+isInstalled bat && { 
+    # BAT COMMAND OPTIONS
+    export BAT_PAGER=''
+    export BAT_STYLE='plain'
+    CATCMD=$(which bat)
 }
 
 
 # Main Functions
-function list () {
-    ls -1p $SNIPPYFILES | egrep -v /$
+helper () {
+    echo "$SCRIPTNAME $SNIPPYVERSION"
+    echo "USAGE:"
+    echo "\t$SCRIPTNAME [-lendpcvh] [snippet]"
+    echo "OPTIONS:"
+    echo "\t-l\tList all exiting snippets"
+    echo "\t-e\tEdit snippet"
+    echo "\t-n\tCreates new snippet"
+    echo "\t-d\tDelete snippet"
+    echo "\t-p\tPreview snippet"
+    isMac && echo "\t-c\tCopy snippet content"
+    echo "\t-v\tPrints $SCRIPTNAME version"
+    echo "\t-h\tPrints this help menu"
 }
 
-function edit () {
-    [ -f $SNIPPYFILES/$1 ] || echo "Creating snippet $1"
-    $EDITOR $SNIPPYFILES/$1
+version () {
+    echo "$SCRIPTNAME $SNIPPYVERSION"
 }
 
-function new () {
-    [ ! -f $SNIPPYFILES/$1 ] && echo "Creating snippet $1" && $EDITOR $SNIPPYFILES/$1 || echo '$1 already exist'
+list () {
+    ls -1p $SNIPPYFILES | egrep -v /$ || echo "You don't have any snippets yet."
 }
 
-function remove () {
-    mv $SNIPPYFILES/$1 $SNIPPYFILES/.trash
+edit () {
+    [ -f "$SNIPPYFILES/$1" ] || echo "Creating snippet $1"
+    $SNIPPYEDITOR $SNIPPYFILES/$1
 }
 
-function copy () {
+new () {
+    [ ! -f "$SNIPPYFILES/$1" ] && $SNIPPYEDITOR "$SNIPPYFILES/$1" && echo "Created snippet $1" || echo "$1 already exist"
+}
+
+remove () {
+    mv "$SNIPPYFILES/$1" "$SNIPPYFILES/.trash/"
+}
+
+copy () {
     ! isMac && echo 'This option is currently only available on Mac OS' || $CATCMD $SNIPPYFILES/$1 | pbcopy && echo "$1 copied to clipboard"
 }
 
-function preview () {
+preview () {
     $CATCMD $SNIPPYFILES/$1
 }
 
-while getopts :qw:e o; do
-    case $o in
+while getopts "e:n:c:p:d:hlv" o; do
+    case "$o" in
         n )
-            new $OPTARG
+            new "$OPTARG"
             ;;
         e )
-            edit $OPTARG
+            edit "$OPTARG"
             ;;
         l )
             list
             ;;
         c )
-            copy $OPTARG
+            copy "$OPTARG"
             ;;
         p )
-            preview $OPTARG
+            preview "$OPTARG"
             ;;
         d )
-            remove $OPTARG
+            remove "$OPTARG"
             ;;
         h )
             helper
             ;;
-        \? )
+        v )
+            version
+            ;;
+        [?] )
             helper
             ;;
+        
     esac
 done
