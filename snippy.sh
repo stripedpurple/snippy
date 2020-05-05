@@ -63,31 +63,38 @@ helper () {
 
 version () {
     echo "$SCRIPTNAME $SNIPPYVERSION"
+    exit
 }
 
 list () {
     ls -1p $SNIPPYFILES | egrep -v /$ || echo "You don't have any snippets yet."
+    exit
 }
 
 edit () {
     [ -f "$SNIPPYFILES/$1" ] || echo "Creating snippet $1"
     $SNIPPYEDITOR $SNIPPYFILES/$1
+    exit
 }
 
 new () {
     [ ! -f "$SNIPPYFILES/$1" ] && $SNIPPYEDITOR "$SNIPPYFILES/$1" && echo "Created snippet $1" || echo "$1 already exist"
+    exit
 }
 
 remove () {
     mv "$SNIPPYFILES/$1" "$SNIPPYFILES/.trash/"
+    exit
 }
 
 copy () {
     ! isMac && echo 'This option is currently only available on Mac OS' || $CATCMD $SNIPPYFILES/$1 | pbcopy && echo "$1 copied to clipboard"
+    exit
 }
 
 preview () {
     $CATCMD $SNIPPYFILES/$1
+    exit
 }
 
 while getopts "e:n:c:p:d:hlv" o; do
@@ -122,3 +129,5 @@ while getopts "e:n:c:p:d:hlv" o; do
         
     esac
 done
+
+helper
