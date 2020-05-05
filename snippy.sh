@@ -1,16 +1,13 @@
 #!/usr/bin/env sh
-# TODO
-# - look for necessary commands at startup
-# - linux copy support
-
 # getopts config
 set -e
 # set -u
 
 # Global Varibles
-SCRIPTNAME=$(basename $0)
+SNIPPYSCRIPTNAME="$(basename $0)"
+SNIPPYSCRIPTLOCATION="$(dirname $0)"
+SNIPPYGITLOCATION="$(dirname $(ls -l $0 | awk -F ' -> ' '{print $NF}'))"
 UNAME=$(uname)
-CATCMD=$(which cat)
 [ -z $SNIPPYEDITOR ] && SNIPPYEDITOR=$EDITOR
 [ -z $SNIPPYFILES ] && SNIPPYFILES="$HOME/.snippy"
 SNIPPYVERSION='v1.0'
@@ -37,32 +34,35 @@ isLinux () {
 [ ! -d "$SNIPPYFILES" ] && mkdir -p $SNIPPYFILES
 [ ! -d "$SNIPPYFILES/.trash" ] && mkdir -p "$SNIPPYFILES/.trash"
 
-isInstalled bat && { 
+[ -z "$SNIPPYCATCMD" ] && isInstalled bat && { 
     # BAT COMMAND OPTIONS
     export BAT_PAGER=''
     export BAT_STYLE='plain'
-    CATCMD=$(which bat)
-}
+    SNIPPYCATCMD=$(which bat)
+} || ([ -z "$SNIPPYCATCMD" ] && SNIPPYCATCMD="$(which cat)") || SNIPPYCATCMD="$SNIPPYCATCMD"
 
 
 # Main Functions
 helper () {
-    echo "$SCRIPTNAME $SNIPPYVERSION"
+    echo "$SNIPPYSCRIPTNAME $SNIPPYVERSION"
     echo "USAGE:"
-    echo "\t$SCRIPTNAME [-lendpcvh] [snippet]"
+    echo "\t$SNIPPYSCRIPTNAME [-lendpUcvh] [snippet]"
     echo "OPTIONS:"
     echo "\t-l\tList all exiting snippets"
     echo "\t-e\tEdit snippet"
     echo "\t-n\tCreates new snippet"
     echo "\t-d\tDelete snippet"
     echo "\t-p\tPreview snippet"
+    echo "\t-U\tUpdates $SCRIPTNAME (Requires git)"
     isMac && echo "\t-c\tCopy snippet content"
     echo "\t-v\tPrints $SCRIPTNAME version"
     echo "\t-h\tPrints this help menu"
+
+    exit
 }
 
 version () {
-    echo "$SCRIPTNAME $SNIPPYVERSION"
+    echo "$SNIPPYSCRIPTNAME $SNIPPYVERSION"
     exit
 }
 
@@ -88,16 +88,24 @@ remove () {
 }
 
 copy () {
-    ! isMac && echo 'This option is currently only available on Mac OS' || $CATCMD $SNIPPYFILES/$1 | pbcopy && echo "$1 copied to clipboard"
+    ! isMac && echo 'This option is currently only available on Mac OS' || $SNIPPYCATCMD $SNIPPYFILES/$1 | pbcopy && echo "$1 copied to clipboard"
     exit
 }
 
 preview () {
-    $CATCMD $SNIPPYFILES/$1
+    $SNIPPYCATCMD $SNIPPYFILES/$1
     exit
 }
 
-while getopts "e:n:c:p:d:hlv" o; do
+upgrade () {
+    isInstalled git && {
+        cd $SNIPPYGITLOCATION
+        git pull > /dev/null && echo 'Upgrade complete!' || echo 'Upgrade failed!'
+        exit
+    } || echo "git is required to update $SCRIPTNAME"
+}
+
+while getopts "e:n:c:p:d:hlvU" o; do
     case "$o" in
         n )
             new "$OPTARG"
@@ -122,6 +130,9 @@ while getopts "e:n:c:p:d:hlv" o; do
             ;;
         v )
             version
+            ;;
+        U )
+            upgrade
             ;;
         [?] )
             helper
