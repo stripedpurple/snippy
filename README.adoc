@@ -39,18 +39,22 @@ There are several configurations options that can be set as env varibles in your
 `$SNIPPYFILES` is the directory you wish to store your snippets. ***Default `$HOME/.snippy`***
 
 `$SNIPPYEDITOR` is the editor you wish to edit and create snippets in. ***Default `$EDITOR`***
+
 TIP: You can also use a visual editor like VS Code by setting `$SNIPPYEDITOR` to `$VISUAL` or `$(which code)`
 
 `$SNIPPYCATCMD` the version of cat to use when previewing snippets. ***Default `cat` or `bat`(if it is installed)***
+
 TIP: Other alternatives are `less`, `bat`, `vim`, etc
 
 === Features
 Preview with syntax highlighting. This relies on link:https://github.com/sharkdp/bat[bat] *(A cat(1) clone with wings.)*.
+
 TIP: For this to work you need to make sure you added the proper extension to your snippets
 
 If you do have bat installed and wish to over ride it be sure to set the `$SNIPPYCATCMD` env varible
 
 You can copy snippets to clipbpard
+
 TIP: This is currently Mac OS only
 
 === Recommendations
@@ -73,6 +77,7 @@ If you are using `git` you will need to add, commit, and push your changes. Cons
 ----
 */5 * * * * ( cd /path/to/repo && git pull && git add -A && git commit -am wip && git push) 2>&1  > /dev/null
 ----
+
 TIP: Please note this is an oversimplified example and might not be the right cron job for you.
 
 == TODOs
