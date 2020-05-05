@@ -38,7 +38,7 @@ There are several configurations options that can be set as env varibles in your
 `$SNIPPYEDITOR` is the editor you wish to edit and create snippets in. ***Default `$EDITOR`***
 > You can also use a visual editor like VS Code by setting `$SNIPPYEDITOR` to `$VISUAL` or `$(which code)`
 
-`$SNIPPYCATCMD` the version of cat to use when previewing snippets. ***Default `cat` or `bat`(if it is installed)
+`$SNIPPYCATCMD` the version of cat to use when previewing snippets. ***Default `cat` or `bat`(if it is installed)***
 > Other alternatives are `less`, `bat`, `vim`, etc
 
 ### Features
