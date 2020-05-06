@@ -7,6 +7,7 @@ set -e
 SNIPPYSCRIPTNAME="$(basename $0)"
 SNIPPYSCRIPTLOCATION="$(dirname $0)"
 SNIPPYGITLOCATION="$(dirname $(ls -l $0 | awk -F ' -> ' '{print $NF}'))"
+SNIPPYCODENAME="Who Will Cut Our Hair When We're Gone?"
 UNAME=$(uname)
 [ -z $SNIPPYEDITOR ] && SNIPPYEDITOR=$EDITOR
 [ -z $SNIPPYFILES ] && SNIPPYFILES="$HOME/.snippy"
@@ -34,7 +35,7 @@ isLinux () {
 [ ! -d "$SNIPPYFILES" ] && mkdir -p $SNIPPYFILES
 [ ! -d "$SNIPPYFILES/.trash" ] && mkdir -p "$SNIPPYFILES/.trash"
 
-[ -z "$SNIPPYCATCMD" ] && isInstalled bat && { 
+[ -z "$SNIPPYCATCMD" ] && isInstalled bat && {
     # BAT COMMAND OPTIONS
     export BAT_PAGER=''
     export BAT_STYLE='plain'
@@ -62,7 +63,14 @@ helper () {
 }
 
 version () {
-    echo "$SNIPPYSCRIPTNAME $SNIPPYVERSION"
+    echo "$SNIPPYSCRIPTNAME $SNIPPYVERSION ($SNIPPYCODENAME)"
+    echo
+    echo "To anyone who knows me it is no big secret that I love TV.\nOne of my favorite show to re-binge is \"How I Met Your Mother\" (Cristin Milioti what a gem).\nDuring the great COVID-19 re-binge I spent alot my of my time focused on the music of HIMYM.\nThat is where I first heard of the band The Unicorns, and the album that gives this versions its code name."
+    echo
+    echo "\"Who Will Cut Our Hair When We're Gone?\" is the second and final studio album by Canadian indie rock band the Unicorns.\nIt features several re-arranged versions of songs from their earlier self-released album Unicorns Are People Too."
+    echo
+    echo "Album release date: October 21, 2003"
+    echo "https://open.spotify.com/album/3CZAwft1FIOixtUqkIPiUI"
     exit
 }
 
@@ -137,7 +145,7 @@ while getopts "e:n:c:p:d:hlvU" o; do
         [?] )
             helper
             ;;
-        
+
     esac
 done
 
